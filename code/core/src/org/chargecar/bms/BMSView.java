@@ -76,7 +76,7 @@ public final class BMSView extends StreamingSerialPortDeviceView<BMSAndEnergy>
 
       // configure the meters ==========================================================================================
 
-      meterConfig.setSize(400, 400);
+      meterConfig.setSize(350, 350);
       meterConfig.setRange(0, 1000);
       meterConfig.setTicks(100, 9);
       meterConfig.setNumberFormat(new DecimalFormat("###0.0"));
