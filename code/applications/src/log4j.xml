@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+   <!-- Define appenders -->
+   <appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+      <layout class="org.apache.log4j.PatternLayout">
+         <param name="ConversionPattern" value="%d{HH:mm:ss,SSS} [%t] %-5p: %m%n"/>
+      </layout>
+   </appender>
+
+   <appender name="LogFileAppender" class="org.apache.log4j.RollingFileAppender">
+      <param name="File" value="./logs/bartels-porsche.log"/>
+      <param name="MaxFileSize" value="1024MB"/>
+      <layout class="org.apache.log4j.PatternLayout">
+         <param name="ConversionPattern" value="%d [%t] %-5p: %m%n"/>
+      </layout>
+   </appender>
+
+   <appender name="LogFileAppender_DataOnly" class="org.apache.log4j.RollingFileAppender">
+      <param name="File" value="./logs/bartels-porsche-data.log"/>
+      <param name="MaxFileSize" value="1024MB"/>
+      <layout class="org.apache.log4j.PatternLayout">
+         <param name="ConversionPattern" value="%d %m%n"/>
+      </layout>
+   </appender>
+
+   <logger name="DataLog" additivity="false">
+      <appender-ref ref="LogFileAppender_DataOnly"/>
+   </logger>
+
+   <root>
+      <priority value="debug"/>
+      <appender-ref ref="ConsoleAppender"/>
+      <appender-ref ref="LogFileAppender"/>
+   </root>
+
+</log4j:configuration>
+

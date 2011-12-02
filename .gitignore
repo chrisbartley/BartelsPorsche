@@ -1,0 +1,8 @@
+code/applications/build
+code/applications/dist
+code/core/build
+code/core/dist
+logs/
+.DS_Store
+*.iws
+intellij_idea_bin
