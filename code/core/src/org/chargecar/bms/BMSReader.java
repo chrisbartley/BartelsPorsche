@@ -116,6 +116,7 @@ class BMSReader extends StreamingSerialPortReader<BMSEvent>
                                    final byte[] cellDataTemperatures,
                                    final byte[] cellDataResistances)
       {
+      // RS-232 specs: http://lithiumate.elithion.com/php/rs232_specs.php
 
       final ByteBuffer contentGroupByteBuffer = ByteBuffer.wrap(contentGroup);
 
