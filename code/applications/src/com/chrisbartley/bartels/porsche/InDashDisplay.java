@@ -2,6 +2,7 @@ package com.chrisbartley.bartels.porsche;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ public final class InDashDisplay
    private static final Logger LOG = Logger.getLogger(InDashDisplay.class);
    private static final PropertyResourceBundle RESOURCES = (PropertyResourceBundle)PropertyResourceBundle.getBundle(InDashDisplay.class.getName());
    private static final String APPLICATION_NAME = RESOURCES.getString("application.name");
+   private static final Dimension PREFERRED_WINDOW_SIZE = new Dimension(800, 600);
 
    public static void main(final String[] args)
       {
@@ -72,6 +74,8 @@ public final class InDashDisplay
       final JFrame jFrame = new JFrame(APPLICATION_NAME);
       jFrame.setContentPane(panel);
 
+      panel.setPreferredSize(PREFERRED_WINDOW_SIZE);// changed it to preferredSize, Thanks!
+
       // create the model
       final BMSModel bmsModel = new BMSModel(BartelsPorscheConstants.NUM_BATTERIES);
 
@@ -85,7 +89,6 @@ public final class InDashDisplay
       // create the views
       final BMSView bmsView = new BMSView(bmsController);
       final InDashDisplayView inDashDisplayView = new InDashDisplayView(inDashDisplayController,
-                                                                        bmsController,
                                                                         bmsModel,
                                                                         bmsView);
 
