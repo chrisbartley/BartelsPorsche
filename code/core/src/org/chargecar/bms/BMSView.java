@@ -365,16 +365,19 @@ public final class BMSView extends StreamingSerialPortDeviceView<BMSAndEnergy>
    private final class FaultStatusPanel extends JPanel
       {
       private final JLabel value = SwingUtils.createLabel(UserInterfaceConstants.UNKNOWN_VALUE,
-                                                          new Font(GUIConstants.FONT_NORMAL.getFontName(),
+                                                          new Font(GUIConstants.FONT_MEDIUM.getFontName(),
                                                                    Font.BOLD,
-                                                                   GUIConstants.FONT_NORMAL.getSize()));
+                                                                   GUIConstants.FONT_MEDIUM.getSize()));
 
       private FaultStatusPanel()
          {
          this.setBackground(Color.WHITE);
          this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
          this.add(Box.createGlue());
-         this.add(SwingUtils.createLabel(RESOURCES.getString("label.bms-status") + ":"));
+         this.add(SwingUtils.createLabel(RESOURCES.getString("label.bms-status") + ":",
+                                         new Font(GUIConstants.FONT_MEDIUM.getFontName(),
+                                                  Font.PLAIN,
+                                                  GUIConstants.FONT_MEDIUM.getSize())));
          this.add(SwingUtils.createRigidSpacer());
          this.add(value);
          this.add(Box.createGlue());
