@@ -9,6 +9,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
+import javax.swing.table.AbstractTableModel;
 import edu.cmu.ri.createlab.userinterface.GUIConstants;
 import edu.cmu.ri.createlab.userinterface.util.SwingUtils;
 import org.apache.log4j.Logger;
@@ -34,15 +35,15 @@ public final class BMSView extends StreamingSerialPortDeviceView<BMSAndEnergy>
    private final Meter batteryVoltageMeter;
 
    private final Gauge<Double> packTotalVoltageGauge = new Gauge<Double>(RESOURCES.getString("label.pack-total-voltage"), "%6.2f");
-   private final Gauge<Double> minimumCellVoltageGauge = new Gauge<Double>(RESOURCES.getString("label.minimum-cell-voltage"), "%6.2f");
-   private final Gauge<Double> maximumCellVoltageGauge = new Gauge<Double>(RESOURCES.getString("label.maximum-cell-voltage"), "%6.2f");
-   private final Gauge<Double> averageCellVoltageGauge = new Gauge<Double>(RESOURCES.getString("label.average-cell-voltage"), "%6.2f");
+   private final Gauge<Double> minimumCellVoltageGauge = new Gauge<Double>(RESOURCES.getString("label.minimum-cell-voltage"), "%4.2f");
+   private final Gauge<Double> maximumCellVoltageGauge = new Gauge<Double>(RESOURCES.getString("label.maximum-cell-voltage"), "%4.2f");
+   private final Gauge<Double> averageCellVoltageGauge = new Gauge<Double>(RESOURCES.getString("label.average-cell-voltage"), "%4.2f");
    private final Gauge<Integer> cellNumWithLowestVoltageGauge = new Gauge<Integer>(RESOURCES.getString("label.cell-num-with-lowest-voltage"), "%2d");
    private final Gauge<Integer> cellNumWithHighestVoltageGauge = new Gauge<Integer>(RESOURCES.getString("label.cell-num-with-highest-voltage"), "%2d");
 
-   private final Gauge<Integer> minimumCellTempGauge = new Gauge<Integer>(RESOURCES.getString("label.minimum-cell-temp"), "%3d");
-   private final Gauge<Integer> maximumCellTempGauge = new Gauge<Integer>(RESOURCES.getString("label.maximum-cell-temp"), "%3d");
-   private final Gauge<Integer> averageCellTempGauge = new Gauge<Integer>(RESOURCES.getString("label.average-cell-temp"), "%3d");
+   private final Gauge<Integer> minimumCellTempGauge = new Gauge<Integer>(RESOURCES.getString("label.minimum-cell-temp"), "%2d");
+   private final Gauge<Integer> maximumCellTempGauge = new Gauge<Integer>(RESOURCES.getString("label.maximum-cell-temp"), "%2d");
+   private final Gauge<Integer> averageCellTempGauge = new Gauge<Integer>(RESOURCES.getString("label.average-cell-temp"), "%2d");
    private final Gauge<Integer> cellNumWithLowestTempGauge = new Gauge<Integer>(RESOURCES.getString("label.cell-num-with-lowest-temp"), "%2d");
    private final Gauge<Integer> cellNumWithHighestTempGauge = new Gauge<Integer>(RESOURCES.getString("label.cell-num-with-highest-temp"), "%2d");
 
@@ -67,8 +68,12 @@ public final class BMSView extends StreamingSerialPortDeviceView<BMSAndEnergy>
    private final Gauge<Double> batteryEnergyUsedGauge = new Gauge<Double>(RESOURCES.getString("label.used"), "%07.3f");
    private final Gauge<Double> batteryEnergyRegenGauge = new Gauge<Double>(RESOURCES.getString("label.regen"), "%07.3f");
 
-   public BMSView(final BMSController bmsController)
+   private final BatteriesTableModel batteriesTableModel;
+
+   public BMSView(final BMSController bmsController, final BMSModel bmsModel)
       {
+      batteriesTableModel = new BatteriesTableModel(bmsModel.getNumBatteries());
+
       final DefaultMeterConfig meterConfig = new DefaultMeterConfig(3);
       meterConfig.setDatasetColor(0, Color.RED);
       meterConfig.setDatasetColor(1, Color.GREEN);
@@ -168,6 +173,9 @@ public final class BMSView extends StreamingSerialPortDeviceView<BMSAndEnergy>
          batteryEnergyTotalGauge.setValue(bmsAndEnergy.getEnergyEquation().getKilowattHours());
          batteryEnergyUsedGauge.setValue(bmsAndEnergy.getEnergyEquation().getKilowattHoursUsed());
          batteryEnergyRegenGauge.setValue(bmsAndEnergy.getEnergyEquation().getKilowattHoursRegen());
+
+         batteriesTableModel.setVoltages(bmsAndEnergy.getBmsState().getCellVoltages());
+         batteriesTableModel.setTemperatures(bmsAndEnergy.getBmsState().getCellTemperatures());
          }
       else
          {
@@ -209,6 +217,9 @@ public final class BMSView extends StreamingSerialPortDeviceView<BMSAndEnergy>
          batteryEnergyTotalGauge.setValue(null);
          batteryEnergyUsedGauge.setValue(null);
          batteryEnergyRegenGauge.setValue(null);
+
+         batteriesTableModel.setVoltages(null);
+         batteriesTableModel.setTemperatures(null);
          }
       }
 
@@ -362,6 +373,11 @@ public final class BMSView extends StreamingSerialPortDeviceView<BMSAndEnergy>
       return batteryEnergyRegenGauge;
       }
 
+   public BatteriesTableModel getBatteriesTableModel()
+      {
+      return batteriesTableModel;
+      }
+
    private final class FaultStatusPanel extends JPanel
       {
       private final JLabel value = SwingUtils.createLabel(UserInterfaceConstants.UNKNOWN_VALUE,
@@ -403,6 +419,127 @@ public final class BMSView extends StreamingSerialPortDeviceView<BMSAndEnergy>
             value.setForeground(UserInterfaceConstants.RED);
             value.setText(UserInterfaceConstants.UNKNOWN_VALUE);
             }
+         }
+      }
+
+   private final class BatteriesTableModel extends AbstractTableModel
+      {
+      private final int numBatteries;
+
+      private final double[] defaultVoltages;
+      private final int[] defaultTemperatures;
+
+      private final double[] voltages;
+      private final int[] temperatures;
+
+      private BatteriesTableModel(final int numBatteries)
+         {
+         this.numBatteries = numBatteries;
+
+         defaultVoltages = new double[numBatteries];  // default value is zero
+         defaultTemperatures = new int[numBatteries]; // default value is zero
+
+         voltages = new double[numBatteries];
+         temperatures = new int[numBatteries];
+         }
+
+      @Override
+      public String getColumnName(final int col)
+         {
+         switch (col)
+            {
+            case 0:
+               return RESOURCES.getString("label.battery-table.battery");
+            case 1:
+               return RESOURCES.getString("label.battery-table.voltage");
+            case 2:
+               return RESOURCES.getString("label.battery-table.temperature");
+            default:
+               LOG.error("Unexpected column indeax [" + col + "]");
+            }
+         return "???";
+         }
+
+      @Override
+      public Class<?> getColumnClass(final int col)
+         {
+         switch (col)
+            {
+            case 0:
+               return Integer.class;
+            case 1:
+               return Double.class;
+            case 2:
+               return Integer.class;
+            default:
+               LOG.error("Unexpected column indeax [" + col + "]");
+            }
+         return Object.class;
+         }
+
+      @Override
+      public int getRowCount()
+         {
+         return numBatteries;
+         }
+
+      @Override
+      public int getColumnCount()
+         {
+         return 3;
+         }
+
+      @Override
+      public Object getValueAt(final int row, final int col)
+         {
+         switch (col)
+            {
+            case 0:
+               return row + 1;
+            case 1:
+               return voltages[row];
+            case 2:
+               return temperatures[row];
+            default:
+               LOG.error("Unexpected column indeax [" + col + "]");
+            }
+         return null;
+         }
+
+      private void setVoltages(final double[] newVoltages)
+         {
+         final double[] newData;
+         if (newVoltages != null && newVoltages.length >= numBatteries)
+            {
+            newData = newVoltages;
+            }
+         else
+            {
+            newData = defaultVoltages;
+            }
+         // copy in the new data
+         System.arraycopy(newData, 0, voltages, 0, numBatteries);
+
+         // fire the update event
+         fireTableRowsUpdated(0, numBatteries - 1);
+         }
+
+      private void setTemperatures(final int[] newTemperatures)
+         {
+         final int[] newData;
+         if (newTemperatures != null && newTemperatures.length >= numBatteries)
+            {
+            newData = newTemperatures;
+            }
+         else
+            {
+            newData = defaultTemperatures;
+            }
+         // copy in the new data
+         System.arraycopy(newData, 0, temperatures, 0, numBatteries);
+
+         // fire the update event
+         fireTableRowsUpdated(0, numBatteries - 1);
          }
       }
 

@@ -117,5 +117,9 @@ public interface BMSEvent
 
    int getPower();
 
+   double[] getCellVoltages();
+
+   int[] getCellTemperatures();
+
    String toLoggingString();
    }

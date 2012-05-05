@@ -477,6 +477,16 @@ final class BMSEventImpl extends BaseStreamingSerialPortEvent implements BMSEven
       return power;
       }
 
+   public double[] getCellVoltages()
+      {
+      return cellVoltages.clone();
+      }
+
+   public int[] getCellTemperatures()
+      {
+      return cellTemperatures.clone();
+      }
+
    @Override
    public String toString()
       {

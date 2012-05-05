@@ -87,7 +87,7 @@ public final class InDashDisplay
       final InDashDisplayController inDashDisplayController = new InDashDisplayController(lifecycleManager);
 
       // create the views
-      final BMSView bmsView = new BMSView(bmsController);
+      final BMSView bmsView = new BMSView(bmsController, bmsModel);
       final InDashDisplayView inDashDisplayView = new InDashDisplayView(inDashDisplayController,
                                                                         bmsModel,
                                                                         bmsView);
