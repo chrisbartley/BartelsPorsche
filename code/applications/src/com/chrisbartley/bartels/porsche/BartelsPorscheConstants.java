@@ -5,7 +5,7 @@ package com.chrisbartley.bartels.porsche;
  */
 public final class BartelsPorscheConstants
    {
-   public static final int NUM_BATTERIES = 88;
+   public static final int NUM_BATTERIES = 48;
 
    private BartelsPorscheConstants()
       {
