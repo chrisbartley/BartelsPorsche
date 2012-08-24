@@ -128,11 +128,13 @@ class BMSReader extends StreamingSerialPortReader<BMSEvent>
                                                            contentGroupByteBuffer.get(4),
                                                            contentGroupByteBuffer.get(5));
 
-      // reported value is in 100 mA units, so divide by 10 to get A
-      final double sourceCurrentAmps = contentGroupByteBuffer.getShort(6) / 10.0;
+      // reported value is in 100 mA units, so divide by 10 to get A.  However, doing so makes the numbers too small
+      // by a factor of 10, so I've commented that out.  Wish I could explain it.
+      final double sourceCurrentAmps = contentGroupByteBuffer.getShort(6); // 10.0;
 
-      // reported value is in 100 mA units, so divide by 10 to get A
-      final double loadCurrentAmps = contentGroupByteBuffer.getShort(8) / 10.0;
+      // reported value is in 100 mA units, so divide by 10 to get A.  However, doing so makes the numbers too small
+      // by a factor of 10, so I've commented that out.  Wish I could explain it.
+      final double loadCurrentAmps = contentGroupByteBuffer.getShort(8); // 10.0;
 
       final byte variousIOState = contentGroupByteBuffer.get(10);
 
