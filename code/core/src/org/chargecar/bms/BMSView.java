@@ -92,7 +92,7 @@ public final class BMSView extends StreamingSerialPortDeviceView<BMSAndEnergy>
       // ---------------------------------------------------------------------------------------------------------------
 
       meterConfig.clearDialRanges();
-      meterConfig.setRange(120, 180);
+      meterConfig.setRange(120, 170);
       meterConfig.setTicks(5, 4);
       meterConfig.addDialRange(120, 130, Color.RED);
       meterConfig.addDialRange(130, 135, new Color(255, 150, 0));
